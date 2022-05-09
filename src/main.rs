@@ -1,5 +1,3 @@
-
-
 #[derive(Clone)]
 struct Solution {
   target: usize,
@@ -85,9 +83,6 @@ fn all_solutions(target: usize, coins: &Vec<usize>) -> Vec<Solution> {
         let mut new_coins = next_coins;
         new_coins.push(*coin);
 
-        // this is not necessary for the program to function, it just looks nicer
-        new_coins.sort();
-
         partial.possible = true;
         partial.necessary_coins = Some(new_coins);
         break;
@@ -97,11 +92,25 @@ fn all_solutions(target: usize, coins: &Vec<usize>) -> Vec<Solution> {
     partials[target] = partial.clone();
   }
 
+  // this is not necessary for the program to function, it just looks nicer
+  for i in 0..=target {
+    let mut partial = partials[i].clone();
+
+    partial.necessary_coins = partial.necessary_coins.and_then(|cs| {
+      let mut cs = cs;
+      cs.sort();
+      cs.reverse();
+      Some(cs)
+    });
+
+    partials[i] = partial;
+  }
+
   partials
 }
 
 fn find_solution(target: usize, coins: &Vec<usize>) -> Solution {
-  all_solutions(target, coins)[target].clone()
+  all_solutions(target, coins).last().unwrap().clone()
 }
 
 fn print_solution(solution: Solution) {
@@ -117,8 +126,8 @@ fn print_solution(solution: Solution) {
 
 
 fn main() {
-  let coins: Vec<usize> = vec![50, 50, 20, 10, 10, 10, 5, 5, 5, 5, 5, 5, 2, 2, 2, 1, 1, 1];
-  let target: usize = 100;
+  let coins: Vec<usize> = vec![5, 2, 2, 2, 1];
+  let target: usize = coins.iter().fold(0, |acc, i| acc + i);
 
   for solution in all_solutions(target, &coins) {
     print_solution(solution);
