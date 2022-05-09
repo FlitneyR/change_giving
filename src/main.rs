@@ -35,7 +35,7 @@ impl Countable<usize> for &Vec<usize> {
   }
 }
 
-fn generate_intermediates(target: usize) -> Vec<Solution>{
+fn generate_partials(target: usize) -> Vec<Solution>{
   let mut ret = Vec::new();
 
   ret.push(Solution {
@@ -64,19 +64,19 @@ fn available_coin<C1, C2>(coin: usize, from_coins: C1, without_coins: C2) -> boo
 }
 
 fn all_solutions(target: usize, coins: &Vec<usize>) -> Vec<Solution> {
-  let mut intermediates = generate_intermediates(target);
+  let mut partials = generate_partials(target);
 
   let mut coins = coins.clone();
   coins.sort();
   coins.reverse();
 
   for target in 1..=target {
-    let mut intermediate = intermediates[target].clone();
+    let mut partial = partials[target].clone();
 
     for coin in coins.iter() {
       if target < *coin { continue }
 
-      let next_inter = intermediates[target - coin].clone();
+      let next_inter = partials[target - coin].clone();
       if !next_inter.possible { continue }
 
       let next_coins = next_inter.necessary_coins.unwrap();
@@ -88,16 +88,16 @@ fn all_solutions(target: usize, coins: &Vec<usize>) -> Vec<Solution> {
         // this is not necessary for the program to function, it just looks nicer
         new_coins.sort();
 
-        intermediate.possible = true;
-        intermediate.necessary_coins = Some(new_coins);
+        partial.possible = true;
+        partial.necessary_coins = Some(new_coins);
         break;
       }
     }
 
-    intermediates[target] = intermediate.clone();
+    partials[target] = partial.clone();
   }
 
-  intermediates
+  partials
 }
 
 fn find_solution(target: usize, coins: &Vec<usize>) -> Solution {
