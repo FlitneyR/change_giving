@@ -109,6 +109,7 @@ fn all_solutions(target: usize, coins: &Vec<usize>) -> Vec<Solution> {
   partials
 }
 
+#[allow(dead_code)]
 fn find_solution(target: usize, coins: &Vec<usize>) -> Solution {
   all_solutions(target, coins).last().unwrap().clone()
 }
