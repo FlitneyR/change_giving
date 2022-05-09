@@ -63,11 +63,12 @@ fn available_coin<C1, C2>(coin: usize, from_coins: C1, without_coins: C2) -> boo
   > 0
 }
 
-fn find_solution<'a>(target: usize, coins: Vec<usize>) -> Solution {
+fn all_solutions(target: usize, coins: &Vec<usize>) -> Vec<Solution> {
   let mut intermediates = generate_intermediates(target);
 
-  let mut coins = coins;
+  let mut coins = coins.clone();
   coins.sort();
+  coins.reverse();
 
   for target in 1..=target {
     let mut intermediate = intermediates[target].clone();
@@ -84,43 +85,42 @@ fn find_solution<'a>(target: usize, coins: Vec<usize>) -> Solution {
         let mut new_coins = next_coins;
         new_coins.push(*coin);
 
+        // this is not necessary for the program to function, it just looks nicer
+        new_coins.sort();
+
         intermediate.possible = true;
         intermediate.necessary_coins = Some(new_coins);
+        break;
       }
     }
 
     intermediates[target] = intermediate.clone();
   }
 
-  intermediates[target].clone()
+  intermediates
+}
+
+fn find_solution(target: usize, coins: &Vec<usize>) -> Solution {
+  all_solutions(target, coins)[target].clone()
 }
 
 fn print_solution(solution: Solution) {
-  if !solution.possible {
-    println!("{} is not possible", solution.target);
-  } else {
-    print!("{} is possible with: ", solution.target);
-    for coin in solution.necessary_coins.unwrap() {
-      print!("{coin} ");
+  print!("{}: ", solution.target);
+  match solution.necessary_coins {
+    None => println!("impossible"),
+    Some(coins) => match coins.len() {
+      0 => println!("no change needed"),
+      _ => println!("{}", coins.iter().map(|s| format!("{s}")).collect::<Vec<String>>().join(" "))
     }
-    println!("");
   }
 }
 
 
 fn main() {
-  let target: usize = 27;
-  let coins: Vec<usize> = vec![50, 20, 10, 5, 2, 1];
+  let coins: Vec<usize> = vec![50, 50, 20, 10, 10, 10, 5, 5, 5, 5, 5, 5, 2, 2, 2, 1, 1, 1];
+  let target: usize = 100;
 
-  print_solution(find_solution(target, coins));
-  
-  let target: usize = 28;
-  let coins: Vec<usize> = vec![50, 20, 10, 5, 2, 1];
-
-  print_solution(find_solution(target, coins));
-  
-  let target: usize = 29;
-  let coins: Vec<usize> = vec![50, 20, 10, 5, 2, 1];
-
-  print_solution(find_solution(target, coins));
+  for solution in all_solutions(target, &coins) {
+    print_solution(solution);
+  }
 }
