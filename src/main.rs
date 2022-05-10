@@ -116,9 +116,9 @@ fn find_solution(target: usize, coins: &Vec<usize>) -> Solution {
   all_solutions(target, coins).last().unwrap().clone()
 }
 
-fn print_solution(solution: Solution) {
+fn print_solution(solution: &Solution) {
   print!("{}: ", solution.target);
-  match solution.necessary_coins {
+  match &solution.necessary_coins {
     None => println!("impossible"),
     Some(coins) => match coins.len() {
       0 => println!("no change needed"),
@@ -137,7 +137,5 @@ fn main() {
 
   let target: usize = coins.iter().fold(0, |acc, i| acc + i);
 
-  for solution in all_solutions(target, &coins) {
-    print_solution(solution);
-  }
+  let _ = all_solutions(target, &coins).iter().map(print_solution);
 }
