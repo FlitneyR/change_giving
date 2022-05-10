@@ -1,3 +1,5 @@
+use std::env;
+
 #[derive(Clone)]
 struct Solution {
   target: usize,
@@ -127,7 +129,12 @@ fn print_solution(solution: Solution) {
 
 
 fn main() {
-  let coins: Vec<usize> = vec![5, 2, 2, 2, 1];
+  let coins: Vec<usize> = env::args()
+    .map(|s| s.parse())
+    .filter(|u| u.is_ok())
+    .map(|u| u.unwrap())
+    .collect();
+
   let target: usize = coins.iter().fold(0, |acc, i| acc + i);
 
   for solution in all_solutions(target, &coins) {
