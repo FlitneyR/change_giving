@@ -7,6 +7,19 @@ struct Solution {
   necessary_coins: Option<Vec<usize>>
 }
 
+impl Solution {
+  fn to_string(solution: &Solution) -> String {
+    format!("{}: {}", solution.target,
+      match &solution.necessary_coins {
+        None => format!("impossible"),
+        Some(coins) => match coins.len() {
+          0 => format!("no change needed"),
+          _ => format!("{}", coins.iter().map(|s| format!("{s}")).collect::<Vec<String>>().join(" "))
+        }
+      })
+  }
+}
+
 trait Countable<T> {
   fn count_where<P>(self: &Self, predicate: P) -> usize where P: Fn(&T) -> bool;
 }
@@ -116,17 +129,6 @@ fn find_solution(target: usize, coins: &Vec<usize>) -> Solution {
   all_solutions(target, coins).last().unwrap().clone()
 }
 
-fn print_solution(solution: &Solution) {
-  print!("{}: ", solution.target);
-  match &solution.necessary_coins {
-    None => println!("impossible"),
-    Some(coins) => match coins.len() {
-      0 => println!("no change needed"),
-      _ => println!("{}", coins.iter().map(|s| format!("{s}")).collect::<Vec<String>>().join(" "))
-    }
-  }
-}
-
 
 fn main() {
   let coins: Vec<usize> = env::args()
@@ -137,5 +139,8 @@ fn main() {
 
   let target: usize = coins.iter().fold(0, |acc, i| acc + i);
 
-  let _ = all_solutions(target, &coins).iter().map(print_solution);
+  let solutions = all_solutions(target, &coins);
+  let solutions: Vec<String> = solutions.iter().map(Solution::to_string).collect();
+
+  println!("{}", solutions.join("\n"));
 }
